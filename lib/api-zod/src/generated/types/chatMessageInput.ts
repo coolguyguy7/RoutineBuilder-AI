@@ -5,9 +5,6 @@
  * Routine Builder AI API
  * OpenAPI spec version: 0.1.0
  */
-export interface HealthStatus {
-  status: string;
-}
 
 export interface ChatMessageInput {
   /** The user's message */
@@ -23,18 +20,3 @@ export interface ChatMessageInput {
      */
   uploadedFileId?: string | null;
 }
-
-export interface UploadedFile {
-  fileId: string;
-  filename: string;
-}
-
-export interface Achievement {
-  id: string;
-  title: string;
-  description: string;
-  icon: string;
-  criteria: string;
-  criteriaCount: number;
-}
-

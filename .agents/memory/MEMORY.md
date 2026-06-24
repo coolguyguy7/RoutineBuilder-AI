@@ -1,0 +1,1 @@
+- [OpenAI Responses API patterns](openai-responses-api.md) — Use client.responses.create() top-level, not beta.assistants. Binary OpenAPI fields break Node.js typecheck.

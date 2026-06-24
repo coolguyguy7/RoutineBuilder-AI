@@ -1,22 +1,24 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Routine Builder AI API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: chat
+    description: Chat operations
+  - name: achievements
+    description: Achievement operations
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +26,54 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /chat/messages:
+    post:
+      operationId: sendChatMessage
+      tags: [chat]
+      summary: Send a chat message (SSE streaming)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatMessageInput"
+      responses:
+        "200":
+          description: SSE stream of response chunks
+          content:
+            text/event-stream:
+              schema:
+                type: string
+
+  /chat/files:
+    post:
+      operationId: uploadChatFile
+      tags: [chat]
+      summary: Upload a file for use in chat
+      responses:
+        "200":
+          description: Uploaded file info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UploadedFile"
+
+  /achievements:
+    get:
+      operationId: getAchievements
+      tags: [achievements]
+      summary: Get all achievement definitions
+      responses:
+        "200":
+          description: List of achievements
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Achievement"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +84,51 @@ components:
       required:
         - status
 
+    ChatMessageInput:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: The user's message
+        previousResponseId:
+          type: ["string", "null"]
+          description: The previous OpenAI response ID for conversation chaining
+        uploadedFileId:
+          type: ["string", "null"]
+          description: Optional OpenAI file ID to attach to this message
+
+    UploadedFile:
+      type: object
+      required:
+        - fileId
+        - filename
+      properties:
+        fileId:
+          type: string
+        filename:
+          type: string
+
+    Achievement:
+      type: object
+      required:
+        - id
+        - title
+        - description
+        - icon
+        - criteria
+        - criteriaCount
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        icon:
+          type: string
+        criteria:
+          type: string
+        criteriaCount:
+          type: integer

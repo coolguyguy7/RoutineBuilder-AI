@@ -1,36 +1,50 @@
-# [Project name]
+# Routine Builder AI
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+A dark-mode AI chat app that helps students build better summer routines while having fun, powered by an OpenAI vector store of routine documents.
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
+- `pnpm --filter @workspace/api-server run dev` — run the API server (port varies by workflow)
+- `pnpm --filter @workspace/routine-builder run dev` — run the frontend
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- Required env: `OPENAI_API_KEY` — OpenAI API key (set in Secrets)
 
 ## Stack
 
 - pnpm workspaces, Node.js 24, TypeScript 5.9
+- Frontend: React 19 + Vite + Tailwind CSS + shadcn/ui, wouter routing
 - API: Express 5
-- DB: PostgreSQL + Drizzle ORM
-- Validation: Zod (`zod/v4`), `drizzle-zod`
-- API codegen: Orval (from OpenAPI spec)
-- Build: esbuild (CJS bundle)
+- AI: OpenAI Responses API (`client.responses.create()`), vector store `vs_6a3bf99c76648191a316dfd7894e4728`
+- File uploads: multer (server) → OpenAI Files API (`purpose: "assistants"`)
+- Build: esbuild (CJS bundle for server)
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `lib/api-spec/openapi.yaml` — API contract (source of truth)
+- `lib/api-client-react/src/generated/` — generated React Query hooks
+- `lib/api-zod/src/generated/` — generated Zod schemas (used by server)
+- `artifacts/api-server/src/routes/chat.ts` — chat SSE + file upload routes
+- `artifacts/api-server/src/routes/achievements.ts` — achievement definitions
+- `artifacts/routine-builder/src/` — React frontend
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- Uses OpenAI **Responses API** (not deprecated Assistants API). `client.responses.create()` is top-level.
+- `previous_response_id` chaining keeps conversation context — no database needed.
+- The vector store ID is hardcoded in `chat.ts` (from `config.json`) — do not rebuild or re-upload the corpus.
+- Achievements are tracked client-side in localStorage; backend only serves definitions.
+- SSE streaming is simulated by word-chunking the full response for reliability.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- Hero section with app name and welcome message
+- 4 clickable suggested starter prompts
+- Streaming AI responses with expandable citation pills
+- File upload (PDF, txt, docx) attached per message
+- Achievement badge panel (6 achievements) with localStorage progress tracking
+- Dark mode throughout
 
 ## User preferences
 
@@ -38,7 +52,10 @@ _Populate as you build — explicit user instructions worth remembering across s
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- Never use `client.beta.assistants` / `client.beta.threads` / `client.beta.runs` — those are deprecated.
+- `client.vector_stores` and `client.responses` are TOP-LEVEL in OpenAI SDK v2.
+- After any OpenAPI spec change, run `pnpm --filter @workspace/api-spec run codegen` before using updated types.
+- The `File` constructor in Node.js requires `Uint8Array`, not raw `Buffer` — always wrap: `new Uint8Array(buf)`.
 
 ## Pointers
 
