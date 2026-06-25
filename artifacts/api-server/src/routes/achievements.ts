@@ -172,10 +172,10 @@ const ACHIEVEMENTS = [
   {
     id: "theme_collector",
     title: "Theme Collector",
-    description: "Use every available color theme at least once",
+    description: "Use all 10 color themes at least once",
     icon: "layout-grid",
     criteria: "all_themes_tried",
-    criteriaCount: 4,
+    criteriaCount: 10,
   },
   {
     id: "prompt_user",

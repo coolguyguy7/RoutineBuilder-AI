@@ -1,6 +1,16 @@
 import { useState, useEffect, useCallback } from "react";
 
-export type ThemeId = "midnight" | "forest" | "violet" | "ocean";
+export type ThemeId =
+  | "midnight"
+  | "forest"
+  | "violet"
+  | "ocean"
+  | "sunset"
+  | "rose"
+  | "amber"
+  | "slate"
+  | "ruby"
+  | "teal";
 
 export interface ThemeConfig {
   id: ThemeId;
@@ -58,6 +68,72 @@ export const THEMES: ThemeConfig[] = [
     muted: "205 35% 16%",
     primary: "195 85% 50%",
     ring: "195 85% 50%",
+  },
+  {
+    id: "sunset",
+    label: "Sunset",
+    background: "15 40% 9%",
+    card: "15 40% 11%",
+    border: "15 30% 17%",
+    secondary: "15 30% 17%",
+    muted: "15 30% 17%",
+    primary: "22 100% 60%",
+    ring: "22 100% 60%",
+  },
+  {
+    id: "rose",
+    label: "Rose",
+    background: "340 35% 9%",
+    card: "340 35% 11%",
+    border: "340 25% 17%",
+    secondary: "340 25% 17%",
+    muted: "340 25% 17%",
+    primary: "346 80% 65%",
+    ring: "346 80% 65%",
+  },
+  {
+    id: "amber",
+    label: "Amber",
+    background: "35 35% 8%",
+    card: "35 35% 10%",
+    border: "35 25% 16%",
+    secondary: "35 25% 16%",
+    muted: "35 25% 16%",
+    primary: "43 96% 56%",
+    ring: "43 96% 56%",
+  },
+  {
+    id: "slate",
+    label: "Slate",
+    background: "215 28% 9%",
+    card: "215 28% 11%",
+    border: "215 20% 17%",
+    secondary: "215 20% 17%",
+    muted: "215 20% 17%",
+    primary: "213 60% 65%",
+    ring: "213 60% 65%",
+  },
+  {
+    id: "ruby",
+    label: "Ruby",
+    background: "0 35% 8%",
+    card: "0 35% 10%",
+    border: "0 25% 16%",
+    secondary: "0 25% 16%",
+    muted: "0 25% 16%",
+    primary: "4 86% 58%",
+    ring: "4 86% 58%",
+  },
+  {
+    id: "teal",
+    label: "Teal",
+    background: "175 38% 8%",
+    card: "175 38% 10%",
+    border: "175 28% 15%",
+    secondary: "175 28% 15%",
+    muted: "175 28% 15%",
+    primary: "172 76% 48%",
+    ring: "172 76% 48%",
   },
 ];
 
