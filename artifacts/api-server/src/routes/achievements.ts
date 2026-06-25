@@ -135,6 +135,30 @@ const ACHIEVEMENTS = [
     criteriaCount: 1,
   },
   {
+    id: "nutrition_nerd",
+    title: "Nutrition Nerd",
+    description: "Ask about food, diet, or nutrition in your routine",
+    icon: "salad",
+    criteria: "nutrition_questions",
+    criteriaCount: 1,
+  },
+  {
+    id: "mind_and_body",
+    title: "Mind & Body",
+    description: "Ask about mental health, stress, or mindfulness",
+    icon: "heart",
+    criteria: "mindfulness_questions",
+    criteriaCount: 1,
+  },
+  {
+    id: "productivity_pro",
+    title: "Productivity Pro",
+    description: "Ask about time management, planning, or productivity",
+    icon: "list-checks",
+    criteria: "productivity_questions",
+    criteriaCount: 1,
+  },
+  {
     id: "goal_setter",
     title: "Goal Setter",
     description: "Mention a personal goal or target in a message",
@@ -181,6 +205,15 @@ const ACHIEVEMENTS = [
     description: "Chat with Routine AI before 11 AM",
     icon: "alarm-clock",
     criteria: "morning_sessions",
+    criteriaCount: 1,
+  },
+  // --- UI interactions ---
+  {
+    id: "explorer",
+    title: "Explorer",
+    description: "Open both the Achievements and Settings menus",
+    icon: "layout-dashboard",
+    criteria: "both_menus_opened",
     criteriaCount: 1,
   },
   // --- Files ---
@@ -262,10 +295,10 @@ const ACHIEVEMENTS = [
   {
     id: "halfway_there",
     title: "Halfway There",
-    description: "Unlock 17 of the 34 available achievements",
+    description: "Unlock 20 of the 40 available achievements",
     icon: "award",
     criteria: "achievements_unlocked",
-    criteriaCount: 17,
+    criteriaCount: 20,
   },
   // --- SECRETS ---
   {
@@ -282,6 +315,22 @@ const ACHIEVEMENTS = [
     description: "Hint: Real devs don't just ask questions — they run them. Maybe try executing your prompt?",
     icon: "terminal",
     criteria: "print_questions",
+    criteriaCount: 1,
+  },
+  {
+    id: "secret_bot_clicks",
+    title: "Bot Whisperer",
+    description: "Hint: Some icons are more interactive than they look... persistence pays off.",
+    icon: "mouse-pointer-click",
+    criteria: "bot_icon_clicks",
+    criteriaCount: 10,
+  },
+  {
+    id: "secret_word",
+    title: "Word of Power",
+    description: "Hint: Some words unlock more than doors... try slipping the right one into your message.",
+    icon: "key",
+    criteria: "secret_word_messages",
     criteriaCount: 1,
   },
 ];

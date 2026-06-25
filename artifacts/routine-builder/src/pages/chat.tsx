@@ -15,9 +15,11 @@ import {
   LucideTarget, LucideVolume2, LucideHelpCircle, LucideClock, LucideHardDrive,
   LucideAward, LucideTerminal, LucideBookOpen, LucideLibrary, LucideSmartphone,
   LucidePenLine, LucideGitCompare, LucideAlarmClock, LucideDatabase,
+  LucideSalad, LucideHeart, LucideListChecks, LucideLayoutDashboard,
+  LucideMousePointerClick, LucideKey,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useTheme, THEMES, type ThemeId } from "@/hooks/use-theme";
+import { useTheme, type ThemeId } from "@/hooks/use-theme";
 
 type Citation = { filename: string; text?: string };
 type Message = { id: string; role: "user" | "assistant"; content: string; citations?: Citation[] };
@@ -30,7 +32,7 @@ const SUGGESTED_PROMPTS = [
   "How do I build healthy habits that actually stick?",
 ];
 
-const SECRET_IDS = new Set(["secret_math", "secret_print"]);
+const SECRET_IDS = new Set(["secret_math", "secret_print", "secret_bot_clicks", "secret_word"]);
 
 const ICON_MAP: Record<string, React.ReactNode> = {
   sparkles: <LucideSparkles className="w-5 h-5" />,
@@ -67,6 +69,12 @@ const ICON_MAP: Record<string, React.ReactNode> = {
   "git-compare": <LucideGitCompare className="w-5 h-5" />,
   "alarm-clock": <LucideAlarmClock className="w-5 h-5" />,
   database: <LucideDatabase className="w-5 h-5" />,
+  salad: <LucideSalad className="w-5 h-5" />,
+  heart: <LucideHeart className="w-5 h-5" />,
+  "list-checks": <LucideListChecks className="w-5 h-5" />,
+  "layout-dashboard": <LucideLayoutDashboard className="w-5 h-5" />,
+  "mouse-pointer-click": <LucideMousePointerClick className="w-5 h-5" />,
+  key: <LucideKey className="w-5 h-5" />,
 };
 
 function getProgress(): Record<string, number> {
@@ -75,6 +83,8 @@ function getProgress(): Record<string, number> {
   const triedRaw = localStorage.getItem("triedThemes");
   const triedThemes: string[] = triedRaw ? JSON.parse(triedRaw) : ["midnight"];
   const unlocked: string[] = JSON.parse(localStorage.getItem("unlockedAchievements") || "[]");
+  const achievementsOpened = localStorage.getItem("achievementsMenuOpened") === "1";
+  const settingsOpened = localStorage.getItem("settingsMenuOpened") === "1";
   return {
     messages_sent: parseInt(localStorage.getItem("messagesSent") || "0", 10),
     files_uploaded: parseInt(localStorage.getItem("filesUploaded") || "0", 10),
@@ -90,14 +100,20 @@ function getProgress(): Record<string, number> {
     screen_questions: parseInt(localStorage.getItem("screenQuestions") || "0", 10),
     writing_questions: parseInt(localStorage.getItem("writingQuestions") || "0", 10),
     balance_questions: parseInt(localStorage.getItem("balanceQuestions") || "0", 10),
+    nutrition_questions: parseInt(localStorage.getItem("nutritionQuestions") || "0", 10),
+    mindfulness_questions: parseInt(localStorage.getItem("mindfulnessQuestions") || "0", 10),
+    productivity_questions: parseInt(localStorage.getItem("productivityQuestions") || "0", 10),
     goal_messages: parseInt(localStorage.getItem("goalMessages") || "0", 10),
     long_messages: parseInt(localStorage.getItem("longMessages") || "0", 10),
     all_caps_message: parseInt(localStorage.getItem("allCapsMessages") || "0", 10),
     questions_asked: parseInt(localStorage.getItem("questionsAsked") || "0", 10),
     night_sessions: parseInt(localStorage.getItem("nightSessions") || "0", 10),
     morning_sessions: parseInt(localStorage.getItem("morningSessions") || "0", 10),
+    both_menus_opened: achievementsOpened && settingsOpened ? 1 : 0,
+    bot_icon_clicks: parseInt(localStorage.getItem("botIconClicks") || "0", 10),
     math_questions: parseInt(localStorage.getItem("mathQuestions") || "0", 10),
     print_questions: parseInt(localStorage.getItem("printQuestions") || "0", 10),
+    secret_word_messages: parseInt(localStorage.getItem("secretWordMessages") || "0", 10),
     themes_tried: parseInt(localStorage.getItem("themesSwitched") || "1", 10),
     all_themes_tried: triedThemes.length,
     used_prompt: parseInt(localStorage.getItem("usedPrompt") || "0", 10),
@@ -136,6 +152,9 @@ function analyzeMessage(text: string) {
   if (/social media|screen time|phone time|instagram|tiktok|youtube|scrolling|digital detox/.test(lower)) inc("screenQuestions");
   if (/writing|write|journal(ing)?|essay|creative writing/.test(lower)) inc("writingQuestions");
   if (/balanc(e|ing).{1,30}(and|with|between)|juggl|split.{1,20}time|divide.{1,20}time|manage both/.test(lower)) inc("balanceQuestions");
+  if (/\b(food|eat|meal|diet|nutrition|calorie|protein|vegetable|fruit|cooking|snack)\b/.test(lower)) inc("nutritionQuestions");
+  if (/\b(mental health|stress|anxiety|mindful|meditation|meditate|wellbeing|well-being|calm|overwhelm|burnout)\b/.test(lower)) inc("mindfulnessQuestions");
+  if (/\b(productiv|time management|plann|schedul|priorit|focus|efficiency|deep work|pomodoro)\b/.test(lower)) inc("productivityQuestions");
   if (/\bgoal|target|objective|aim\b/.test(lower)) inc("goalMessages");
   if (trim.length > 150) inc("longMessages");
   if (trim.length >= 3 && /[A-Z]/.test(trim) && trim === trim.toUpperCase()) inc("allCapsMessages");
@@ -149,6 +168,7 @@ function analyzeMessage(text: string) {
     inc("mathQuestions");
   }
   if (/^print\(["'][\s\S]+["']\)$/.test(trim)) inc("printQuestions");
+  if (/\bsecret\b/.test(lower)) inc("secretWordMessages");
 }
 
 export default function ChatPage() {
@@ -184,7 +204,7 @@ export default function ChatPage() {
         const current = progress[a.criteria] ?? 0;
         if (current >= a.criteriaCount && !next.has(a.id)) {
           next.add(a.id);
-          newlyUnlocked.push(SECRET_IDS.has(a.id) ? a.title : a.title);
+          newlyUnlocked.push(a.title);
         }
       }
       if (newlyUnlocked.length > 0) {
@@ -197,6 +217,25 @@ export default function ChatPage() {
       toast({ title: "Achievement Unlocked!", description: title });
     }
   }, [achievements, toast]);
+
+  const handleBotIconClick = () => {
+    inc("botIconClicks");
+    checkAchievements(getProgress());
+  };
+
+  const handleAchievementsMenuOpen = (open: boolean) => {
+    if (open) {
+      localStorage.setItem("achievementsMenuOpened", "1");
+      checkAchievements(getProgress());
+    }
+  };
+
+  const handleSettingsMenuOpen = (open: boolean) => {
+    if (open) {
+      localStorage.setItem("settingsMenuOpened", "1");
+      checkAchievements(getProgress());
+    }
+  };
 
   const trackTheme = (id: string) => {
     const raw = localStorage.getItem("triedThemes");
@@ -308,9 +347,13 @@ export default function ChatPage() {
     <div className="flex flex-col h-screen max-h-screen bg-background text-foreground overflow-hidden">
       <header className="flex-shrink-0 flex items-center justify-between px-6 py-4 border-b border-border bg-card">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+          <button
+            onClick={handleBotIconClick}
+            className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary hover:bg-primary/30 transition-colors cursor-pointer focus:outline-none"
+            aria-label="Routine AI logo"
+          >
             <LucideBot className="w-6 h-6" />
-          </div>
+          </button>
           <div>
             <h1 className="font-semibold text-lg leading-tight">(Ethan R.) Summer Routine Builder</h1>
             <p className="text-sm text-muted-foreground">Your personal coach for a great summer</p>
@@ -318,7 +361,7 @@ export default function ChatPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          <Drawer>
+          <Drawer onOpenChange={handleAchievementsMenuOpen}>
             <DrawerTrigger asChild>
               <Button variant="outline" size="sm" className="gap-2 border-primary/20 hover:border-primary/50" data-testid="button-achievements">
                 <LucideTrophy className="w-4 h-4 text-primary" />
@@ -394,7 +437,7 @@ export default function ChatPage() {
             </DrawerContent>
           </Drawer>
 
-          <Drawer>
+          <Drawer onOpenChange={handleSettingsMenuOpen}>
             <DrawerTrigger asChild>
               <Button variant="outline" size="icon" className="border-border hover:border-primary/30" data-testid="button-settings">
                 <LucideSettings className="w-4 h-4" />
