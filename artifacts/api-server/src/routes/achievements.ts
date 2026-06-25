@@ -22,6 +22,14 @@ const ACHIEVEMENTS = [
     criteriaCount: 5,
   },
   {
+    id: "ten_messages",
+    title: "Double Digits",
+    description: "Send 10 messages in total",
+    icon: "hash",
+    criteria: "messages_sent",
+    criteriaCount: 10,
+  },
+  {
     id: "twenty_messages",
     title: "Routine Regular",
     description: "Send 20 messages — you're building a habit",
@@ -168,6 +176,14 @@ const ACHIEVEMENTS = [
   },
   // --- Message style / unique ---
   {
+    id: "minimalist",
+    title: "Minimalist",
+    description: "Send a message that is just one letter",
+    icon: "minus",
+    criteria: "one_letter_message",
+    criteriaCount: 1,
+  },
+  {
     id: "deep_thinker",
     title: "Deep Thinker",
     description: "Send a detailed message over 150 characters",
@@ -295,10 +311,10 @@ const ACHIEVEMENTS = [
   {
     id: "halfway_there",
     title: "Halfway There",
-    description: "Unlock 20 of the 40 available achievements",
+    description: "Unlock 21 of the 42 available achievements",
     icon: "award",
     criteria: "achievements_unlocked",
-    criteriaCount: 20,
+    criteriaCount: 21,
   },
   // --- SECRETS ---
   {

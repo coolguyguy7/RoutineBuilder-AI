@@ -16,7 +16,7 @@ import {
   LucideAward, LucideTerminal, LucideBookOpen, LucideLibrary, LucideSmartphone,
   LucidePenLine, LucideGitCompare, LucideAlarmClock, LucideDatabase,
   LucideSalad, LucideHeart, LucideListChecks, LucideLayoutDashboard,
-  LucideMousePointerClick, LucideKey,
+  LucideMousePointerClick, LucideKey, LucideHash, LucideMinus,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTheme, type ThemeId } from "@/hooks/use-theme";
@@ -75,6 +75,8 @@ const ICON_MAP: Record<string, React.ReactNode> = {
   "layout-dashboard": <LucideLayoutDashboard className="w-5 h-5" />,
   "mouse-pointer-click": <LucideMousePointerClick className="w-5 h-5" />,
   key: <LucideKey className="w-5 h-5" />,
+  hash: <LucideHash className="w-5 h-5" />,
+  minus: <LucideMinus className="w-5 h-5" />,
 };
 
 function getProgress(): Record<string, number> {
@@ -111,6 +113,7 @@ function getProgress(): Record<string, number> {
     morning_sessions: parseInt(localStorage.getItem("morningSessions") || "0", 10),
     both_menus_opened: achievementsOpened && settingsOpened ? 1 : 0,
     bot_icon_clicks: parseInt(localStorage.getItem("botIconClicks") || "0", 10),
+    one_letter_message: parseInt(localStorage.getItem("oneLetterMessages") || "0", 10),
     math_questions: parseInt(localStorage.getItem("mathQuestions") || "0", 10),
     print_questions: parseInt(localStorage.getItem("printQuestions") || "0", 10),
     secret_word_messages: parseInt(localStorage.getItem("secretWordMessages") || "0", 10),
@@ -156,6 +159,7 @@ function analyzeMessage(text: string) {
   if (/\b(mental health|stress|anxiety|mindful|meditation|meditate|wellbeing|well-being|calm|overwhelm|burnout)\b/.test(lower)) inc("mindfulnessQuestions");
   if (/\b(productiv|time management|plann|schedul|priorit|focus|efficiency|deep work|pomodoro)\b/.test(lower)) inc("productivityQuestions");
   if (/\bgoal|target|objective|aim\b/.test(lower)) inc("goalMessages");
+  if (trim.length === 1 && /[a-zA-Z]/.test(trim)) inc("oneLetterMessages");
   if (trim.length > 150) inc("longMessages");
   if (trim.length >= 3 && /[A-Z]/.test(trim) && trim === trim.toUpperCase()) inc("allCapsMessages");
   if (trim.endsWith("?")) inc("questionsAsked");
