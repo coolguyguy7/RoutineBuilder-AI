@@ -6,7 +6,16 @@ import NotFound from "@/pages/not-found";
 import ChatPage from "@/pages/chat";
 import { useTheme } from "@/hooks/use-theme";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 0,
+      gcTime: 0,
+      refetchOnMount: true,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 function Router() {
   return (

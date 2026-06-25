@@ -287,6 +287,7 @@ const ACHIEVEMENTS = [
 ];
 
 router.get("/achievements", async (_req, res): Promise<void> => {
+  res.set("Cache-Control", "no-store");
   res.json(GetAchievementsResponse.parse(ACHIEVEMENTS));
 });
 
