@@ -13,7 +13,8 @@ import {
   LucideSun, LucideBrain, LucideFiles, LucidePalette, LucideCalendar,
   LucideCalculator, LucideLightbulb, LucideLayoutGrid, LucideGamepad2,
   LucideTarget, LucideVolume2, LucideHelpCircle, LucideClock, LucideHardDrive,
-  LucideAward, LucideTerminal, LucideBookOpen,
+  LucideAward, LucideTerminal, LucideBookOpen, LucideLibrary, LucideSmartphone,
+  LucidePenLine, LucideGitCompare, LucideAlarmClock, LucideDatabase,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTheme, THEMES, type ThemeId } from "@/hooks/use-theme";
@@ -60,6 +61,12 @@ const ICON_MAP: Record<string, React.ReactNode> = {
   award: <LucideAward className="w-5 h-5" />,
   terminal: <LucideTerminal className="w-5 h-5" />,
   "book-open": <LucideBookOpen className="w-5 h-5" />,
+  library: <LucideLibrary className="w-5 h-5" />,
+  "smartphone-off": <LucideSmartphone className="w-5 h-5" />,
+  "pen-line": <LucidePenLine className="w-5 h-5" />,
+  "git-compare": <LucideGitCompare className="w-5 h-5" />,
+  "alarm-clock": <LucideAlarmClock className="w-5 h-5" />,
+  database: <LucideDatabase className="w-5 h-5" />,
 };
 
 function getProgress(): Record<string, number> {
@@ -79,11 +86,16 @@ function getProgress(): Record<string, number> {
     weekend_questions: parseInt(localStorage.getItem("weekendQuestions") || "0", 10),
     hobby_questions: parseInt(localStorage.getItem("hobbyQuestions") || "0", 10),
     study_questions: parseInt(localStorage.getItem("studyQuestions") || "0", 10),
+    reading_questions: parseInt(localStorage.getItem("readingQuestions") || "0", 10),
+    screen_questions: parseInt(localStorage.getItem("screenQuestions") || "0", 10),
+    writing_questions: parseInt(localStorage.getItem("writingQuestions") || "0", 10),
+    balance_questions: parseInt(localStorage.getItem("balanceQuestions") || "0", 10),
     goal_messages: parseInt(localStorage.getItem("goalMessages") || "0", 10),
     long_messages: parseInt(localStorage.getItem("longMessages") || "0", 10),
     all_caps_message: parseInt(localStorage.getItem("allCapsMessages") || "0", 10),
     questions_asked: parseInt(localStorage.getItem("questionsAsked") || "0", 10),
     night_sessions: parseInt(localStorage.getItem("nightSessions") || "0", 10),
+    morning_sessions: parseInt(localStorage.getItem("morningSessions") || "0", 10),
     math_questions: parseInt(localStorage.getItem("mathQuestions") || "0", 10),
     print_questions: parseInt(localStorage.getItem("printQuestions") || "0", 10),
     themes_tried: parseInt(localStorage.getItem("themesSwitched") || "1", 10),
@@ -104,57 +116,39 @@ function recordDay() {
   }
 }
 
+function inc(key: string) {
+  localStorage.setItem(key, (parseInt(localStorage.getItem(key) || "0", 10) + 1).toString());
+}
+
 function analyzeMessage(text: string) {
   const lower = text.toLowerCase();
   const trim = text.trim();
 
-  if (/morning|wake up|alarm|breakfast/.test(lower)) {
-    localStorage.setItem("morningQuestions", (parseInt(localStorage.getItem("morningQuestions") || "0", 10) + 1).toString());
-  }
-  if (/evening|night|nighttime|before bed|wind down/.test(lower)) {
-    localStorage.setItem("nightQuestions", (parseInt(localStorage.getItem("nightQuestions") || "0", 10) + 1).toString());
-  }
-  if (/sleep|rest|nap|bedtime/.test(lower)) {
-    localStorage.setItem("sleepQuestions", (parseInt(localStorage.getItem("sleepQuestions") || "0", 10) + 1).toString());
-  }
-  if (/exercise|workout|gym|fitness|run|jog|walk|sport/.test(lower)) {
-    localStorage.setItem("fitnessQuestions", (parseInt(localStorage.getItem("fitnessQuestions") || "0", 10) + 1).toString());
-  }
-  if (/habit|routine|consistent|daily/.test(lower)) {
-    localStorage.setItem("habitQuestions", (parseInt(localStorage.getItem("habitQuestions") || "0", 10) + 1).toString());
-  }
-  if (/weekend|saturday|sunday|days off/.test(lower)) {
-    localStorage.setItem("weekendQuestions", (parseInt(localStorage.getItem("weekendQuestions") || "0", 10) + 1).toString());
-  }
-  if (/hobby|hobbies|interest|passion|leisure|activity|activities/.test(lower)) {
-    localStorage.setItem("hobbyQuestions", (parseInt(localStorage.getItem("hobbyQuestions") || "0", 10) + 1).toString());
-  }
-  if (/study|homework|school|class|exam|test|learn|reading|notes|assignment/.test(lower)) {
-    localStorage.setItem("studyQuestions", (parseInt(localStorage.getItem("studyQuestions") || "0", 10) + 1).toString());
-  }
-  if (/\bgoal|target|objective|aim\b/.test(lower)) {
-    localStorage.setItem("goalMessages", (parseInt(localStorage.getItem("goalMessages") || "0", 10) + 1).toString());
-  }
-  if (trim.length > 150) {
-    localStorage.setItem("longMessages", (parseInt(localStorage.getItem("longMessages") || "0", 10) + 1).toString());
-  }
-  if (trim.length >= 3 && /[A-Z]/.test(trim) && trim === trim.toUpperCase()) {
-    localStorage.setItem("allCapsMessages", (parseInt(localStorage.getItem("allCapsMessages") || "0", 10) + 1).toString());
-  }
-  if (trim.endsWith("?")) {
-    localStorage.setItem("questionsAsked", (parseInt(localStorage.getItem("questionsAsked") || "0", 10) + 1).toString());
-  }
+  if (/morning|wake up|alarm|breakfast/.test(lower)) inc("morningQuestions");
+  if (/evening|night|nighttime|before bed|wind down/.test(lower)) inc("nightQuestions");
+  if (/sleep|rest|nap|bedtime/.test(lower)) inc("sleepQuestions");
+  if (/exercise|workout|gym|fitness|run|jog|walk|sport/.test(lower)) inc("fitnessQuestions");
+  if (/habit|routine|consistent|daily/.test(lower)) inc("habitQuestions");
+  if (/weekend|saturday|sunday|days off/.test(lower)) inc("weekendQuestions");
+  if (/hobby|hobbies|interest|passion|leisure|activity|activities/.test(lower)) inc("hobbyQuestions");
+  if (/study|homework|school|class|exam|test|learn|assignment/.test(lower)) inc("studyQuestions");
+  if (/\bread(ing|s|er)?\b|books?|novel|literature/.test(lower)) inc("readingQuestions");
+  if (/social media|screen time|phone time|instagram|tiktok|youtube|scrolling|digital detox/.test(lower)) inc("screenQuestions");
+  if (/writing|write|journal(ing)?|essay|creative writing/.test(lower)) inc("writingQuestions");
+  if (/balanc(e|ing).{1,30}(and|with|between)|juggl|split.{1,20}time|divide.{1,20}time|manage both/.test(lower)) inc("balanceQuestions");
+  if (/\bgoal|target|objective|aim\b/.test(lower)) inc("goalMessages");
+  if (trim.length > 150) inc("longMessages");
+  if (trim.length >= 3 && /[A-Z]/.test(trim) && trim === trim.toUpperCase()) inc("allCapsMessages");
+  if (trim.endsWith("?")) inc("questionsAsked");
+
   const hour = new Date().getHours();
-  if (hour >= 22 || hour <= 3) {
-    localStorage.setItem("nightSessions", (parseInt(localStorage.getItem("nightSessions") || "0", 10) + 1).toString());
-  }
+  if (hour >= 22 || hour <= 3) inc("nightSessions");
+  if (hour < 11) inc("morningSessions");
+
   if (/\d+.*[+\-*/=÷×]|[+\-*/=÷×].*\d+|\b(calculate|math|how much|add|subtract|multiply|divide|percent|sum|total|equals|times)\b/.test(lower)) {
-    localStorage.setItem("mathQuestions", (parseInt(localStorage.getItem("mathQuestions") || "0", 10) + 1).toString());
+    inc("mathQuestions");
   }
-  // Secret: entire message wrapped in print("...") or print('...')
-  if (/^print\(["'][\s\S]+["']\)$/.test(trim)) {
-    localStorage.setItem("printQuestions", (parseInt(localStorage.getItem("printQuestions") || "0", 10) + 1).toString());
-  }
+  if (/^print\(["'][\s\S]+["']\)$/.test(trim)) inc("printQuestions");
 }
 
 export default function ChatPage() {
@@ -175,9 +169,7 @@ export default function ChatPage() {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
+    if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   };
 
   useEffect(() => { scrollToBottom(); }, [messages]);
@@ -192,7 +184,7 @@ export default function ChatPage() {
         const current = progress[a.criteria] ?? 0;
         if (current >= a.criteriaCount && !next.has(a.id)) {
           next.add(a.id);
-          newlyUnlocked.push(a.title);
+          newlyUnlocked.push(SECRET_IDS.has(a.id) ? a.title : a.title);
         }
       }
       if (newlyUnlocked.length > 0) {
@@ -234,7 +226,7 @@ export default function ChatPage() {
       if (!res.ok) throw new Error("Upload failed");
       const data = await res.json();
       setAttachedFile(data);
-      localStorage.setItem("filesUploaded", (parseInt(localStorage.getItem("filesUploaded") || "0", 10) + 1).toString());
+      inc("filesUploaded");
       checkAchievements(getProgress());
     } catch {
       toast({ title: "Upload Failed", description: "Could not upload file.", variant: "destructive" });
@@ -255,10 +247,8 @@ export default function ChatPage() {
     const currentAttachedFile = attachedFile;
     setAttachedFile(null);
 
-    localStorage.setItem("messagesSent", (parseInt(localStorage.getItem("messagesSent") || "0", 10) + 1).toString());
-    if (fromPrompt) {
-      localStorage.setItem("usedPrompt", "1");
-    }
+    inc("messagesSent");
+    if (fromPrompt) localStorage.setItem("usedPrompt", "1");
     analyzeMessage(text);
     recordDay();
     checkAchievements(getProgress());
@@ -355,19 +345,28 @@ export default function ChatPage() {
                       <div
                         key={a.id}
                         data-testid={`achievement-${a.id}`}
-                        className={`flex items-center gap-4 p-3 rounded-lg border transition-colors ${unlocked ? "border-primary/40 bg-primary/5" : isSecret ? "border-dashed border-muted-foreground/30 bg-background" : "border-border bg-background"}`}
+                        className={`flex items-center gap-4 p-3 rounded-lg border transition-colors ${
+                          unlocked
+                            ? "border-primary/40 bg-primary/5"
+                            : isSecret
+                            ? "border-dashed border-muted-foreground/30 bg-background"
+                            : "border-border bg-background"
+                        }`}
                       >
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${unlocked ? "bg-primary/20 text-primary" : isSecret ? "bg-muted/50 text-muted-foreground/50" : "bg-muted text-muted-foreground"}`}>
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
+                          unlocked ? "bg-primary/20 text-primary" : isSecret ? "bg-muted/50 text-muted-foreground/50" : "bg-muted text-muted-foreground"
+                        }`}>
                           {unlocked
                             ? (ICON_MAP[a.icon] ?? <LucideTrophy className="w-5 h-5" />)
                             : isSecret
-                              ? <span className="text-lg font-bold opacity-40">?</span>
-                              : <LucideLock className="w-4 h-4" />
-                          }
+                            ? <span className="text-lg font-bold opacity-40">?</span>
+                            : <LucideLock className="w-4 h-4" />}
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <span className={`font-medium text-sm ${unlocked ? "text-foreground" : isSecret ? "text-muted-foreground/60 italic" : "text-muted-foreground"}`}>
+                            <span className={`font-medium text-sm ${
+                              unlocked ? "text-foreground" : isSecret ? "text-muted-foreground/60 italic" : "text-muted-foreground"
+                            }`}>
                               {isSecret && !unlocked ? "???" : a.title}
                             </span>
                             {unlocked && <LucideCheck className="w-3.5 h-3.5 text-primary flex-shrink-0" />}
@@ -414,7 +413,11 @@ export default function ChatPage() {
                       key={theme.id}
                       data-testid={`theme-${theme.id}`}
                       onClick={() => handleThemeChange(theme.id as ThemeId)}
-                      className={`flex items-center gap-3 p-3 rounded-lg border text-sm transition-all ${themeId === theme.id ? "border-primary/60 bg-primary/10 text-foreground" : "border-border hover:border-primary/30 text-muted-foreground hover:text-foreground"}`}
+                      className={`flex items-center gap-3 p-3 rounded-lg border text-sm transition-all ${
+                        themeId === theme.id
+                          ? "border-primary/60 bg-primary/10 text-foreground"
+                          : "border-border hover:border-primary/30 text-muted-foreground hover:text-foreground"
+                      }`}
                     >
                       <span
                         className="w-5 h-5 rounded-full flex-shrink-0 border-2"
@@ -458,11 +461,17 @@ export default function ChatPage() {
           <div className="max-w-3xl mx-auto space-y-6">
             {messages.map(msg => (
               <div key={msg.id} className={`flex gap-4 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
-                <div className={`w-8 h-8 flex-shrink-0 rounded-full flex items-center justify-center mt-1 ${msg.role === "user" ? "bg-secondary text-secondary-foreground" : "bg-primary/20 text-primary"}`}>
+                <div className={`w-8 h-8 flex-shrink-0 rounded-full flex items-center justify-center mt-1 ${
+                  msg.role === "user" ? "bg-secondary text-secondary-foreground" : "bg-primary/20 text-primary"
+                }`}>
                   {msg.role === "user" ? <LucideUser className="w-4 h-4" /> : <LucideBot className="w-4 h-4" />}
                 </div>
                 <div className={`max-w-[80%] space-y-2 ${msg.role === "user" ? "items-end" : "items-start"}`}>
-                  <div className={`p-4 rounded-2xl ${msg.role === "user" ? "bg-secondary text-secondary-foreground rounded-tr-sm" : "bg-card border border-border text-card-foreground rounded-tl-sm shadow-sm"}`}>
+                  <div className={`p-4 rounded-2xl ${
+                    msg.role === "user"
+                      ? "bg-secondary text-secondary-foreground rounded-tr-sm"
+                      : "bg-card border border-border text-card-foreground rounded-tl-sm shadow-sm"
+                  }`}>
                     <div className="whitespace-pre-wrap text-sm leading-relaxed">{msg.content || "..."}</div>
                   </div>
                   {msg.citations && msg.citations.length > 0 && (

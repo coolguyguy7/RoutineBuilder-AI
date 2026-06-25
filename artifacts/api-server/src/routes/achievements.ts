@@ -103,6 +103,38 @@ const ACHIEVEMENTS = [
     criteriaCount: 1,
   },
   {
+    id: "bookworm",
+    title: "Bookworm",
+    description: "Ask about fitting reading into your routine",
+    icon: "library",
+    criteria: "reading_questions",
+    criteriaCount: 1,
+  },
+  {
+    id: "digital_detox",
+    title: "Digital Detox",
+    description: "Ask about social media, screen time, or phone use",
+    icon: "smartphone-off",
+    criteria: "screen_questions",
+    criteriaCount: 1,
+  },
+  {
+    id: "pen_and_paper",
+    title: "Pen & Paper",
+    description: "Ask about writing or journaling in your routine",
+    icon: "pen-line",
+    criteria: "writing_questions",
+    criteriaCount: 1,
+  },
+  {
+    id: "juggler",
+    title: "Juggler",
+    description: "Ask about balancing two things at once",
+    icon: "git-compare",
+    criteria: "balance_questions",
+    criteriaCount: 1,
+  },
+  {
     id: "goal_setter",
     title: "Goal Setter",
     description: "Mention a personal goal or target in a message",
@@ -143,6 +175,14 @@ const ACHIEVEMENTS = [
     criteria: "night_sessions",
     criteriaCount: 1,
   },
+  {
+    id: "early_bird",
+    title: "Early Bird",
+    description: "Chat with Routine AI before 11 AM",
+    icon: "alarm-clock",
+    criteria: "morning_sessions",
+    criteriaCount: 1,
+  },
   // --- Files ---
   {
     id: "file_shared",
@@ -167,6 +207,14 @@ const ACHIEVEMENTS = [
     icon: "hard-drive",
     criteria: "files_uploaded",
     criteriaCount: 5,
+  },
+  {
+    id: "file_ten",
+    title: "Archive King",
+    description: "Upload 10 files to your conversations",
+    icon: "database",
+    criteria: "files_uploaded",
+    criteriaCount: 10,
   },
   // --- Theme / prompts ---
   {
@@ -214,10 +262,10 @@ const ACHIEVEMENTS = [
   {
     id: "halfway_there",
     title: "Halfway There",
-    description: "Unlock 14 of the 28 available achievements",
+    description: "Unlock 17 of the 34 available achievements",
     icon: "award",
     criteria: "achievements_unlocked",
-    criteriaCount: 14,
+    criteriaCount: 17,
   },
   // --- SECRETS ---
   {
