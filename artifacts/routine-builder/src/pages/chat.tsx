@@ -11,6 +11,9 @@ import {
   LucideFlame, LucideSunrise, LucideFileUp, LucideLock, LucideCheck,
   LucideZap, LucideMoon, LucideBed, LucideDumbbell, LucideRepeat2,
   LucideSun, LucideBrain, LucideFiles, LucidePalette, LucideCalendar,
+  LucideCalculator, LucideLightbulb, LucideLayoutGrid, LucideGamepad2,
+  LucideTarget, LucideVolume2, LucideHelpCircle, LucideClock, LucideHardDrive,
+  LucideAward,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTheme, THEMES, type ThemeId } from "@/hooks/use-theme";
@@ -25,6 +28,8 @@ const SUGGESTED_PROMPTS = [
   "Give me a schedule for a productive summer day",
   "How do I build healthy habits that actually stick?",
 ];
+
+const SECRET_IDS = new Set(["secret_math"]);
 
 const ICON_MAP: Record<string, React.ReactNode> = {
   sparkles: <LucideSparkles className="w-5 h-5" />,
@@ -43,11 +48,24 @@ const ICON_MAP: Record<string, React.ReactNode> = {
   files: <LucideFiles className="w-5 h-5" />,
   palette: <LucidePalette className="w-5 h-5" />,
   calendar: <LucideCalendar className="w-5 h-5" />,
+  calculator: <LucideCalculator className="w-5 h-5" />,
+  lightbulb: <LucideLightbulb className="w-5 h-5" />,
+  "layout-grid": <LucideLayoutGrid className="w-5 h-5" />,
+  gamepad: <LucideGamepad2 className="w-5 h-5" />,
+  target: <LucideTarget className="w-5 h-5" />,
+  "volume-2": <LucideVolume2 className="w-5 h-5" />,
+  "help-circle": <LucideHelpCircle className="w-5 h-5" />,
+  clock: <LucideClock className="w-5 h-5" />,
+  "hard-drive": <LucideHardDrive className="w-5 h-5" />,
+  award: <LucideAward className="w-5 h-5" />,
 };
 
 function getProgress(): Record<string, number> {
   const daysRaw = localStorage.getItem("daysUsed");
   const days: string[] = daysRaw ? JSON.parse(daysRaw) : [];
+  const triedRaw = localStorage.getItem("triedThemes");
+  const triedThemes: string[] = triedRaw ? JSON.parse(triedRaw) : ["midnight"];
+  const unlocked: string[] = JSON.parse(localStorage.getItem("unlockedAchievements") || "[]");
   return {
     messages_sent: parseInt(localStorage.getItem("messagesSent") || "0", 10),
     files_uploaded: parseInt(localStorage.getItem("filesUploaded") || "0", 10),
@@ -57,9 +75,18 @@ function getProgress(): Record<string, number> {
     fitness_questions: parseInt(localStorage.getItem("fitnessQuestions") || "0", 10),
     habit_questions: parseInt(localStorage.getItem("habitQuestions") || "0", 10),
     weekend_questions: parseInt(localStorage.getItem("weekendQuestions") || "0", 10),
+    hobby_questions: parseInt(localStorage.getItem("hobbyQuestions") || "0", 10),
+    goal_messages: parseInt(localStorage.getItem("goalMessages") || "0", 10),
     long_messages: parseInt(localStorage.getItem("longMessages") || "0", 10),
+    all_caps_message: parseInt(localStorage.getItem("allCapsMessages") || "0", 10),
+    questions_asked: parseInt(localStorage.getItem("questionsAsked") || "0", 10),
+    night_sessions: parseInt(localStorage.getItem("nightSessions") || "0", 10),
+    math_questions: parseInt(localStorage.getItem("mathQuestions") || "0", 10),
     themes_tried: parseInt(localStorage.getItem("themesSwitched") || "1", 10),
+    all_themes_tried: triedThemes.length,
+    used_prompt: parseInt(localStorage.getItem("usedPrompt") || "0", 10),
     days_used: days.length,
+    achievements_unlocked: unlocked.length,
   };
 }
 
@@ -75,33 +102,47 @@ function recordDay() {
 
 function analyzeMessage(text: string) {
   const lower = text.toLowerCase();
+  const trim = text.trim();
+
   if (/morning|wake up|alarm|breakfast/.test(lower)) {
-    const v = parseInt(localStorage.getItem("morningQuestions") || "0", 10) + 1;
-    localStorage.setItem("morningQuestions", v.toString());
+    localStorage.setItem("morningQuestions", (parseInt(localStorage.getItem("morningQuestions") || "0", 10) + 1).toString());
   }
   if (/evening|night|nighttime|before bed|wind down/.test(lower)) {
-    const v = parseInt(localStorage.getItem("nightQuestions") || "0", 10) + 1;
-    localStorage.setItem("nightQuestions", v.toString());
+    localStorage.setItem("nightQuestions", (parseInt(localStorage.getItem("nightQuestions") || "0", 10) + 1).toString());
   }
   if (/sleep|rest|nap|bedtime/.test(lower)) {
-    const v = parseInt(localStorage.getItem("sleepQuestions") || "0", 10) + 1;
-    localStorage.setItem("sleepQuestions", v.toString());
+    localStorage.setItem("sleepQuestions", (parseInt(localStorage.getItem("sleepQuestions") || "0", 10) + 1).toString());
   }
   if (/exercise|workout|gym|fitness|run|jog|walk|sport/.test(lower)) {
-    const v = parseInt(localStorage.getItem("fitnessQuestions") || "0", 10) + 1;
-    localStorage.setItem("fitnessQuestions", v.toString());
+    localStorage.setItem("fitnessQuestions", (parseInt(localStorage.getItem("fitnessQuestions") || "0", 10) + 1).toString());
   }
   if (/habit|routine|consistent|daily/.test(lower)) {
-    const v = parseInt(localStorage.getItem("habitQuestions") || "0", 10) + 1;
-    localStorage.setItem("habitQuestions", v.toString());
+    localStorage.setItem("habitQuestions", (parseInt(localStorage.getItem("habitQuestions") || "0", 10) + 1).toString());
   }
   if (/weekend|saturday|sunday|days off/.test(lower)) {
-    const v = parseInt(localStorage.getItem("weekendQuestions") || "0", 10) + 1;
-    localStorage.setItem("weekendQuestions", v.toString());
+    localStorage.setItem("weekendQuestions", (parseInt(localStorage.getItem("weekendQuestions") || "0", 10) + 1).toString());
   }
-  if (text.length > 150) {
-    const v = parseInt(localStorage.getItem("longMessages") || "0", 10) + 1;
-    localStorage.setItem("longMessages", v.toString());
+  if (/hobby|hobbies|interest|passion|leisure|activity|activities/.test(lower)) {
+    localStorage.setItem("hobbyQuestions", (parseInt(localStorage.getItem("hobbyQuestions") || "0", 10) + 1).toString());
+  }
+  if (/\bgoal|target|objective|aim\b/.test(lower)) {
+    localStorage.setItem("goalMessages", (parseInt(localStorage.getItem("goalMessages") || "0", 10) + 1).toString());
+  }
+  if (trim.length > 150) {
+    localStorage.setItem("longMessages", (parseInt(localStorage.getItem("longMessages") || "0", 10) + 1).toString());
+  }
+  if (trim.length >= 3 && /[A-Z]/.test(trim) && trim === trim.toUpperCase()) {
+    localStorage.setItem("allCapsMessages", (parseInt(localStorage.getItem("allCapsMessages") || "0", 10) + 1).toString());
+  }
+  if (trim.endsWith("?")) {
+    localStorage.setItem("questionsAsked", (parseInt(localStorage.getItem("questionsAsked") || "0", 10) + 1).toString());
+  }
+  const hour = new Date().getHours();
+  if (hour >= 22 || hour <= 3) {
+    localStorage.setItem("nightSessions", (parseInt(localStorage.getItem("nightSessions") || "0", 10) + 1).toString());
+  }
+  if (/\d+.*[+\-*/=÷×]|[+\-*/=÷×].*\d+|\b(calculate|math|how much|add|subtract|multiply|divide|percent|sum|total|equals|times)\b/.test(lower)) {
+    localStorage.setItem("mathQuestions", (parseInt(localStorage.getItem("mathQuestions") || "0", 10) + 1).toString());
   }
 }
 
@@ -154,10 +195,19 @@ export default function ChatPage() {
     }
   }, [achievements, toast]);
 
+  const trackTheme = (id: string) => {
+    const raw = localStorage.getItem("triedThemes");
+    const tried: string[] = raw ? JSON.parse(raw) : ["midnight"];
+    if (!tried.includes(id)) {
+      tried.push(id);
+      localStorage.setItem("triedThemes", JSON.stringify(tried));
+    }
+    const switched = Math.max(parseInt(localStorage.getItem("themesSwitched") || "1", 10) + 1, 2);
+    localStorage.setItem("themesSwitched", switched.toString());
+  };
+
   const handleThemeChange = (id: ThemeId) => {
-    const switched = parseInt(localStorage.getItem("themesSwitched") || "1", 10);
-    const next = Math.max(switched + 1, 2);
-    localStorage.setItem("themesSwitched", next.toString());
+    trackTheme(id);
     changeTheme(id);
     checkAchievements(getProgress());
   };
@@ -173,9 +223,7 @@ export default function ChatPage() {
       if (!res.ok) throw new Error("Upload failed");
       const data = await res.json();
       setAttachedFile(data);
-
-      const count = parseInt(localStorage.getItem("filesUploaded") || "0", 10) + 1;
-      localStorage.setItem("filesUploaded", count.toString());
+      localStorage.setItem("filesUploaded", (parseInt(localStorage.getItem("filesUploaded") || "0", 10) + 1).toString());
       checkAchievements(getProgress());
     } catch {
       toast({ title: "Upload Failed", description: "Could not upload file.", variant: "destructive" });
@@ -185,7 +233,7 @@ export default function ChatPage() {
     }
   };
 
-  const sendMessage = async (text: string) => {
+  const sendMessage = async (text: string, fromPrompt = false) => {
     if (!text.trim() && !attachedFile) return;
 
     const userMsg: Message = { id: Date.now().toString(), role: "user", content: text };
@@ -196,8 +244,10 @@ export default function ChatPage() {
     const currentAttachedFile = attachedFile;
     setAttachedFile(null);
 
-    const msgCount = parseInt(localStorage.getItem("messagesSent") || "0", 10) + 1;
-    localStorage.setItem("messagesSent", msgCount.toString());
+    localStorage.setItem("messagesSent", (parseInt(localStorage.getItem("messagesSent") || "0", 10) + 1).toString());
+    if (fromPrompt) {
+      localStorage.setItem("usedPrompt", "1");
+    }
     analyzeMessage(text);
     recordDay();
     checkAchievements(getProgress());
@@ -286,30 +336,46 @@ export default function ChatPage() {
                 <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
                   {achievements?.map(a => {
                     const unlocked = unlockedIds.has(a.id);
+                    const isSecret = SECRET_IDS.has(a.id);
                     const progress = getProgress()[a.criteria] ?? 0;
                     const pct = Math.min(100, Math.round((progress / a.criteriaCount) * 100));
+
+                    const displayTitle = isSecret && !unlocked ? "???" : a.title;
+                    const displayDesc = isSecret && !unlocked
+                      ? a.description
+                      : unlocked ? a.description : a.description;
+
                     return (
                       <div
                         key={a.id}
                         data-testid={`achievement-${a.id}`}
-                        className={`flex items-center gap-4 p-3 rounded-lg border transition-colors ${unlocked ? "border-primary/40 bg-primary/5" : "border-border bg-background"}`}
+                        className={`flex items-center gap-4 p-3 rounded-lg border transition-colors ${unlocked ? "border-primary/40 bg-primary/5" : isSecret ? "border-dashed border-muted-foreground/30 bg-background" : "border-border bg-background"}`}
                       >
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${unlocked ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"}`}>
-                          {unlocked ? (ICON_MAP[a.icon] ?? <LucideTrophy className="w-5 h-5" />) : <LucideLock className="w-4 h-4" />}
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${unlocked ? "bg-primary/20 text-primary" : isSecret ? "bg-muted/50 text-muted-foreground/50" : "bg-muted text-muted-foreground"}`}>
+                          {unlocked
+                            ? (ICON_MAP[a.icon] ?? <LucideTrophy className="w-5 h-5" />)
+                            : isSecret
+                              ? <span className="text-lg font-bold opacity-40">?</span>
+                              : <LucideLock className="w-4 h-4" />
+                          }
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <span className={`font-medium text-sm ${unlocked ? "text-foreground" : "text-muted-foreground"}`}>{a.title}</span>
+                            <span className={`font-medium text-sm ${unlocked ? "text-foreground" : isSecret ? "text-muted-foreground/60 italic" : "text-muted-foreground"}`}>
+                              {displayTitle}
+                            </span>
                             {unlocked && <LucideCheck className="w-3.5 h-3.5 text-primary flex-shrink-0" />}
+                            {isSecret && !unlocked && (
+                              <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-muted-foreground/30 text-muted-foreground/50">secret</Badge>
+                            )}
                           </div>
-                          <div className="text-xs text-muted-foreground mt-0.5">{a.description}</div>
-                          {!unlocked && (
+                          <div className={`text-xs mt-0.5 ${isSecret && !unlocked ? "text-muted-foreground/50 italic" : "text-muted-foreground"}`}>
+                            {displayDesc}
+                          </div>
+                          {!unlocked && !isSecret && (
                             <div className="mt-2">
                               <div className="h-1 rounded-full bg-muted overflow-hidden">
-                                <div
-                                  className="h-full bg-primary/50 rounded-full transition-all"
-                                  style={{ width: `${pct}%` }}
-                                />
+                                <div className="h-full bg-primary/50 rounded-full transition-all" style={{ width: `${pct}%` }} />
                               </div>
                               <div className="text-xs text-muted-foreground mt-1">{progress} / {a.criteriaCount}</div>
                             </div>
@@ -375,7 +441,7 @@ export default function ChatPage() {
                   key={i}
                   data-testid={`button-prompt-${i}`}
                   className="p-4 rounded-xl border border-border bg-card hover:border-primary/50 hover:bg-primary/5 transition-colors text-sm text-left shadow-sm"
-                  onClick={() => sendMessage(prompt)}
+                  onClick={() => sendMessage(prompt, true)}
                 >
                   {prompt}
                 </button>
@@ -393,7 +459,6 @@ export default function ChatPage() {
                   <div className={`p-4 rounded-2xl ${msg.role === "user" ? "bg-secondary text-secondary-foreground rounded-tr-sm" : "bg-card border border-border text-card-foreground rounded-tl-sm shadow-sm"}`}>
                     <div className="whitespace-pre-wrap text-sm leading-relaxed">{msg.content || "..."}</div>
                   </div>
-
                   {msg.citations && msg.citations.length > 0 && (
                     <div className="flex flex-col gap-2 mt-2 w-full max-w-sm">
                       <Accordion type="single" collapsible className="w-full">

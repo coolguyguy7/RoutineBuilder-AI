@@ -4,6 +4,7 @@ import { GetAchievementsResponse } from "@workspace/api-zod";
 const router: IRouter = Router();
 
 const ACHIEVEMENTS = [
+  // --- Message milestones ---
   {
     id: "first_message",
     title: "First Step",
@@ -36,6 +37,7 @@ const ACHIEVEMENTS = [
     criteria: "messages_sent",
     criteriaCount: 50,
   },
+  // --- Topic-based ---
   {
     id: "morning_routine",
     title: "Early Riser",
@@ -85,6 +87,23 @@ const ACHIEVEMENTS = [
     criteriaCount: 1,
   },
   {
+    id: "hobby_explorer",
+    title: "Hobby Explorer",
+    description: "Ask about fitting hobbies into your routine",
+    icon: "gamepad",
+    criteria: "hobby_questions",
+    criteriaCount: 1,
+  },
+  {
+    id: "goal_setter",
+    title: "Goal Setter",
+    description: "Mention a personal goal or target in a message",
+    icon: "target",
+    criteria: "goal_messages",
+    criteriaCount: 1,
+  },
+  // --- Message style / unique ---
+  {
     id: "deep_thinker",
     title: "Deep Thinker",
     description: "Send a detailed message over 150 characters",
@@ -92,6 +111,31 @@ const ACHIEVEMENTS = [
     criteria: "long_messages",
     criteriaCount: 1,
   },
+  {
+    id: "loud_voice",
+    title: "Loud Voice",
+    description: "Send a message entirely in UPPERCASE",
+    icon: "volume-2",
+    criteria: "all_caps_message",
+    criteriaCount: 1,
+  },
+  {
+    id: "curious_mind",
+    title: "Curious Mind",
+    description: "Ask 5 questions in your conversations",
+    icon: "help-circle",
+    criteria: "questions_asked",
+    criteriaCount: 5,
+  },
+  {
+    id: "midnight_grind",
+    title: "Midnight Grind",
+    description: "Have a late-night routine session (after 10 PM)",
+    icon: "clock",
+    criteria: "night_sessions",
+    criteriaCount: 1,
+  },
+  // --- Files ---
   {
     id: "file_shared",
     title: "Document Drop",
@@ -109,6 +153,15 @@ const ACHIEVEMENTS = [
     criteriaCount: 3,
   },
   {
+    id: "file_five",
+    title: "Document Master",
+    description: "Upload 5 files to your conversations",
+    icon: "hard-drive",
+    criteria: "files_uploaded",
+    criteriaCount: 5,
+  },
+  // --- Theme / prompts ---
+  {
     id: "theme_explorer",
     title: "Style Switcher",
     description: "Try out a different color theme",
@@ -116,6 +169,23 @@ const ACHIEVEMENTS = [
     criteria: "themes_tried",
     criteriaCount: 2,
   },
+  {
+    id: "theme_collector",
+    title: "Theme Collector",
+    description: "Use every available color theme at least once",
+    icon: "layout-grid",
+    criteria: "all_themes_tried",
+    criteriaCount: 4,
+  },
+  {
+    id: "prompt_user",
+    title: "Inspired",
+    description: "Use one of the suggested starter prompts",
+    icon: "lightbulb",
+    criteria: "used_prompt",
+    criteriaCount: 1,
+  },
+  // --- Streaks ---
   {
     id: "streak_three",
     title: "Three Day Streak",
@@ -131,6 +201,24 @@ const ACHIEVEMENTS = [
     icon: "calendar",
     criteria: "days_used",
     criteriaCount: 7,
+  },
+  // --- Meta ---
+  {
+    id: "halfway_there",
+    title: "Halfway There",
+    description: "Unlock 13 of the 26 available achievements",
+    icon: "award",
+    criteria: "achievements_unlocked",
+    criteriaCount: 13,
+  },
+  // --- SECRET ---
+  {
+    id: "secret_math",
+    title: "Math Wizard",
+    description: "Hint: Numbers never lie... try asking the AI to crunch something for you.",
+    icon: "calculator",
+    criteria: "math_questions",
+    criteriaCount: 1,
   },
 ];
 
