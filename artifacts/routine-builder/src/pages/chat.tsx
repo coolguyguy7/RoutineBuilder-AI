@@ -9,6 +9,8 @@ import {
   LucideSend, LucidePaperclip, LucideTrophy, LucideBot, LucideUser,
   LucideFile, LucideX, LucideSettings, LucideSparkles, LucideMessageCircle,
   LucideFlame, LucideSunrise, LucideFileUp, LucideLock, LucideCheck,
+  LucideZap, LucideMoon, LucideBed, LucideDumbbell, LucideRepeat2,
+  LucideSun, LucideBrain, LucideFiles, LucidePalette, LucideCalendar,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTheme, THEMES, type ThemeId } from "@/hooks/use-theme";
@@ -31,6 +33,16 @@ const ICON_MAP: Record<string, React.ReactNode> = {
   "file-up": <LucideFileUp className="w-5 h-5" />,
   sunrise: <LucideSunrise className="w-5 h-5" />,
   flame: <LucideFlame className="w-5 h-5" />,
+  zap: <LucideZap className="w-5 h-5" />,
+  moon: <LucideMoon className="w-5 h-5" />,
+  bed: <LucideBed className="w-5 h-5" />,
+  dumbbell: <LucideDumbbell className="w-5 h-5" />,
+  repeat: <LucideRepeat2 className="w-5 h-5" />,
+  sun: <LucideSun className="w-5 h-5" />,
+  brain: <LucideBrain className="w-5 h-5" />,
+  files: <LucideFiles className="w-5 h-5" />,
+  palette: <LucidePalette className="w-5 h-5" />,
+  calendar: <LucideCalendar className="w-5 h-5" />,
 };
 
 function getProgress(): Record<string, number> {
@@ -40,6 +52,13 @@ function getProgress(): Record<string, number> {
     messages_sent: parseInt(localStorage.getItem("messagesSent") || "0", 10),
     files_uploaded: parseInt(localStorage.getItem("filesUploaded") || "0", 10),
     morning_questions: parseInt(localStorage.getItem("morningQuestions") || "0", 10),
+    night_questions: parseInt(localStorage.getItem("nightQuestions") || "0", 10),
+    sleep_questions: parseInt(localStorage.getItem("sleepQuestions") || "0", 10),
+    fitness_questions: parseInt(localStorage.getItem("fitnessQuestions") || "0", 10),
+    habit_questions: parseInt(localStorage.getItem("habitQuestions") || "0", 10),
+    weekend_questions: parseInt(localStorage.getItem("weekendQuestions") || "0", 10),
+    long_messages: parseInt(localStorage.getItem("longMessages") || "0", 10),
+    themes_tried: parseInt(localStorage.getItem("themesSwitched") || "1", 10),
     days_used: days.length,
   };
 }
@@ -51,6 +70,38 @@ function recordDay() {
   if (!days.includes(today)) {
     days.push(today);
     localStorage.setItem("daysUsed", JSON.stringify(days));
+  }
+}
+
+function analyzeMessage(text: string) {
+  const lower = text.toLowerCase();
+  if (/morning|wake up|alarm|breakfast/.test(lower)) {
+    const v = parseInt(localStorage.getItem("morningQuestions") || "0", 10) + 1;
+    localStorage.setItem("morningQuestions", v.toString());
+  }
+  if (/evening|night|nighttime|before bed|wind down/.test(lower)) {
+    const v = parseInt(localStorage.getItem("nightQuestions") || "0", 10) + 1;
+    localStorage.setItem("nightQuestions", v.toString());
+  }
+  if (/sleep|rest|nap|bedtime/.test(lower)) {
+    const v = parseInt(localStorage.getItem("sleepQuestions") || "0", 10) + 1;
+    localStorage.setItem("sleepQuestions", v.toString());
+  }
+  if (/exercise|workout|gym|fitness|run|jog|walk|sport/.test(lower)) {
+    const v = parseInt(localStorage.getItem("fitnessQuestions") || "0", 10) + 1;
+    localStorage.setItem("fitnessQuestions", v.toString());
+  }
+  if (/habit|routine|consistent|daily/.test(lower)) {
+    const v = parseInt(localStorage.getItem("habitQuestions") || "0", 10) + 1;
+    localStorage.setItem("habitQuestions", v.toString());
+  }
+  if (/weekend|saturday|sunday|days off/.test(lower)) {
+    const v = parseInt(localStorage.getItem("weekendQuestions") || "0", 10) + 1;
+    localStorage.setItem("weekendQuestions", v.toString());
+  }
+  if (text.length > 150) {
+    const v = parseInt(localStorage.getItem("longMessages") || "0", 10) + 1;
+    localStorage.setItem("longMessages", v.toString());
   }
 }
 
@@ -99,12 +150,17 @@ export default function ChatPage() {
     });
 
     for (const title of newlyUnlocked) {
-      toast({
-        title: "Achievement Unlocked!",
-        description: title,
-      });
+      toast({ title: "Achievement Unlocked!", description: title });
     }
   }, [achievements, toast]);
+
+  const handleThemeChange = (id: ThemeId) => {
+    const switched = parseInt(localStorage.getItem("themesSwitched") || "1", 10);
+    const next = Math.max(switched + 1, 2);
+    localStorage.setItem("themesSwitched", next.toString());
+    changeTheme(id);
+    checkAchievements(getProgress());
+  };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -142,12 +198,7 @@ export default function ChatPage() {
 
     const msgCount = parseInt(localStorage.getItem("messagesSent") || "0", 10) + 1;
     localStorage.setItem("messagesSent", msgCount.toString());
-
-    if (/morning/i.test(text)) {
-      const mq = parseInt(localStorage.getItem("morningQuestions") || "0", 10) + 1;
-      localStorage.setItem("morningQuestions", mq.toString());
-    }
-
+    analyzeMessage(text);
     recordDay();
     checkAchievements(getProgress());
 
@@ -224,12 +275,15 @@ export default function ChatPage() {
               </Button>
             </DrawerTrigger>
             <DrawerContent className="bg-card border-border">
-              <div className="max-w-md mx-auto w-full p-6">
-                <DrawerTitle className="text-xl font-bold mb-4 flex items-center gap-2">
+              <div className="max-w-md mx-auto w-full p-6 pb-8">
+                <DrawerTitle className="text-xl font-bold mb-1 flex items-center gap-2">
                   <LucideTrophy className="w-5 h-5 text-primary" />
                   Your Progress
                 </DrawerTitle>
-                <div className="space-y-3">
+                <p className="text-sm text-muted-foreground mb-5">
+                  {unlockedIds.size} / {achievements?.length ?? 0} unlocked
+                </p>
+                <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
                   {achievements?.map(a => {
                     const unlocked = unlockedIds.has(a.id);
                     const progress = getProgress()[a.criteria] ?? 0;
@@ -276,33 +330,31 @@ export default function ChatPage() {
               </Button>
             </DrawerTrigger>
             <DrawerContent className="bg-card border-border">
-              <div className="max-w-md mx-auto w-full p-6">
+              <div className="max-w-md mx-auto w-full p-6 pb-8">
                 <DrawerTitle className="text-xl font-bold mb-5 flex items-center gap-2">
                   <LucideSettings className="w-5 h-5 text-primary" />
                   Appearance
                 </DrawerTitle>
-                <div>
-                  <p className="text-sm text-muted-foreground mb-3">Color theme</p>
-                  <div className="grid grid-cols-2 gap-3">
-                    {themes.map(theme => (
-                      <button
-                        key={theme.id}
-                        data-testid={`theme-${theme.id}`}
-                        onClick={() => changeTheme(theme.id as ThemeId)}
-                        className={`flex items-center gap-3 p-3 rounded-lg border text-sm transition-all ${themeId === theme.id ? "border-primary/60 bg-primary/10 text-foreground" : "border-border hover:border-primary/30 text-muted-foreground hover:text-foreground"}`}
-                      >
-                        <span
-                          className="w-5 h-5 rounded-full flex-shrink-0 border-2"
-                          style={{
-                            background: `hsl(${theme.primary})`,
-                            borderColor: themeId === theme.id ? `hsl(${theme.primary})` : "transparent",
-                          }}
-                        />
-                        {theme.label}
-                        {themeId === theme.id && <LucideCheck className="w-3.5 h-3.5 ml-auto text-primary" />}
-                      </button>
-                    ))}
-                  </div>
+                <p className="text-sm text-muted-foreground mb-3">Color theme</p>
+                <div className="grid grid-cols-2 gap-3">
+                  {themes.map(theme => (
+                    <button
+                      key={theme.id}
+                      data-testid={`theme-${theme.id}`}
+                      onClick={() => handleThemeChange(theme.id as ThemeId)}
+                      className={`flex items-center gap-3 p-3 rounded-lg border text-sm transition-all ${themeId === theme.id ? "border-primary/60 bg-primary/10 text-foreground" : "border-border hover:border-primary/30 text-muted-foreground hover:text-foreground"}`}
+                    >
+                      <span
+                        className="w-5 h-5 rounded-full flex-shrink-0 border-2"
+                        style={{
+                          background: `hsl(${theme.primary})`,
+                          borderColor: themeId === theme.id ? `hsl(${theme.primary})` : "transparent",
+                        }}
+                      />
+                      {theme.label}
+                      {themeId === theme.id && <LucideCheck className="w-3.5 h-3.5 ml-auto text-primary" />}
+                    </button>
+                  ))}
                 </div>
               </div>
             </DrawerContent>
