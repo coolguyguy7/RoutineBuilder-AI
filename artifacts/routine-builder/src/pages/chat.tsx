@@ -13,7 +13,7 @@ import {
   LucideSun, LucideBrain, LucideFiles, LucidePalette, LucideCalendar,
   LucideCalculator, LucideLightbulb, LucideLayoutGrid, LucideGamepad2,
   LucideTarget, LucideVolume2, LucideHelpCircle, LucideClock, LucideHardDrive,
-  LucideAward,
+  LucideAward, LucideTerminal, LucideBookOpen,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTheme, THEMES, type ThemeId } from "@/hooks/use-theme";
@@ -29,7 +29,7 @@ const SUGGESTED_PROMPTS = [
   "How do I build healthy habits that actually stick?",
 ];
 
-const SECRET_IDS = new Set(["secret_math"]);
+const SECRET_IDS = new Set(["secret_math", "secret_print"]);
 
 const ICON_MAP: Record<string, React.ReactNode> = {
   sparkles: <LucideSparkles className="w-5 h-5" />,
@@ -58,6 +58,8 @@ const ICON_MAP: Record<string, React.ReactNode> = {
   clock: <LucideClock className="w-5 h-5" />,
   "hard-drive": <LucideHardDrive className="w-5 h-5" />,
   award: <LucideAward className="w-5 h-5" />,
+  terminal: <LucideTerminal className="w-5 h-5" />,
+  "book-open": <LucideBookOpen className="w-5 h-5" />,
 };
 
 function getProgress(): Record<string, number> {
@@ -76,12 +78,14 @@ function getProgress(): Record<string, number> {
     habit_questions: parseInt(localStorage.getItem("habitQuestions") || "0", 10),
     weekend_questions: parseInt(localStorage.getItem("weekendQuestions") || "0", 10),
     hobby_questions: parseInt(localStorage.getItem("hobbyQuestions") || "0", 10),
+    study_questions: parseInt(localStorage.getItem("studyQuestions") || "0", 10),
     goal_messages: parseInt(localStorage.getItem("goalMessages") || "0", 10),
     long_messages: parseInt(localStorage.getItem("longMessages") || "0", 10),
     all_caps_message: parseInt(localStorage.getItem("allCapsMessages") || "0", 10),
     questions_asked: parseInt(localStorage.getItem("questionsAsked") || "0", 10),
     night_sessions: parseInt(localStorage.getItem("nightSessions") || "0", 10),
     math_questions: parseInt(localStorage.getItem("mathQuestions") || "0", 10),
+    print_questions: parseInt(localStorage.getItem("printQuestions") || "0", 10),
     themes_tried: parseInt(localStorage.getItem("themesSwitched") || "1", 10),
     all_themes_tried: triedThemes.length,
     used_prompt: parseInt(localStorage.getItem("usedPrompt") || "0", 10),
@@ -125,6 +129,9 @@ function analyzeMessage(text: string) {
   if (/hobby|hobbies|interest|passion|leisure|activity|activities/.test(lower)) {
     localStorage.setItem("hobbyQuestions", (parseInt(localStorage.getItem("hobbyQuestions") || "0", 10) + 1).toString());
   }
+  if (/study|homework|school|class|exam|test|learn|reading|notes|assignment/.test(lower)) {
+    localStorage.setItem("studyQuestions", (parseInt(localStorage.getItem("studyQuestions") || "0", 10) + 1).toString());
+  }
   if (/\bgoal|target|objective|aim\b/.test(lower)) {
     localStorage.setItem("goalMessages", (parseInt(localStorage.getItem("goalMessages") || "0", 10) + 1).toString());
   }
@@ -143,6 +150,10 @@ function analyzeMessage(text: string) {
   }
   if (/\d+.*[+\-*/=÷×]|[+\-*/=÷×].*\d+|\b(calculate|math|how much|add|subtract|multiply|divide|percent|sum|total|equals|times)\b/.test(lower)) {
     localStorage.setItem("mathQuestions", (parseInt(localStorage.getItem("mathQuestions") || "0", 10) + 1).toString());
+  }
+  // Secret: entire message wrapped in print("...") or print('...')
+  if (/^print\(["'][\s\S]+["']\)$/.test(trim)) {
+    localStorage.setItem("printQuestions", (parseInt(localStorage.getItem("printQuestions") || "0", 10) + 1).toString());
   }
 }
 
@@ -340,11 +351,6 @@ export default function ChatPage() {
                     const progress = getProgress()[a.criteria] ?? 0;
                     const pct = Math.min(100, Math.round((progress / a.criteriaCount) * 100));
 
-                    const displayTitle = isSecret && !unlocked ? "???" : a.title;
-                    const displayDesc = isSecret && !unlocked
-                      ? a.description
-                      : unlocked ? a.description : a.description;
-
                     return (
                       <div
                         key={a.id}
@@ -362,7 +368,7 @@ export default function ChatPage() {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
                             <span className={`font-medium text-sm ${unlocked ? "text-foreground" : isSecret ? "text-muted-foreground/60 italic" : "text-muted-foreground"}`}>
-                              {displayTitle}
+                              {isSecret && !unlocked ? "???" : a.title}
                             </span>
                             {unlocked && <LucideCheck className="w-3.5 h-3.5 text-primary flex-shrink-0" />}
                             {isSecret && !unlocked && (
@@ -370,7 +376,7 @@ export default function ChatPage() {
                             )}
                           </div>
                           <div className={`text-xs mt-0.5 ${isSecret && !unlocked ? "text-muted-foreground/50 italic" : "text-muted-foreground"}`}>
-                            {displayDesc}
+                            {a.description}
                           </div>
                           {!unlocked && !isSecret && (
                             <div className="mt-2">

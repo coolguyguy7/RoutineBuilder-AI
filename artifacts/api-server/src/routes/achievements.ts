@@ -95,6 +95,14 @@ const ACHIEVEMENTS = [
     criteriaCount: 1,
   },
   {
+    id: "study_buddy",
+    title: "Study Buddy",
+    description: "Ask about studying or schoolwork in your routine",
+    icon: "book-open",
+    criteria: "study_questions",
+    criteriaCount: 1,
+  },
+  {
     id: "goal_setter",
     title: "Goal Setter",
     description: "Mention a personal goal or target in a message",
@@ -206,18 +214,26 @@ const ACHIEVEMENTS = [
   {
     id: "halfway_there",
     title: "Halfway There",
-    description: "Unlock 13 of the 26 available achievements",
+    description: "Unlock 14 of the 28 available achievements",
     icon: "award",
     criteria: "achievements_unlocked",
-    criteriaCount: 13,
+    criteriaCount: 14,
   },
-  // --- SECRET ---
+  // --- SECRETS ---
   {
     id: "secret_math",
     title: "Math Wizard",
     description: "Hint: Numbers never lie... try asking the AI to crunch something for you.",
     icon: "calculator",
     criteria: "math_questions",
+    criteriaCount: 1,
+  },
+  {
+    id: "secret_print",
+    title: "Code Whisperer",
+    description: "Hint: Real devs don't just ask questions — they run them. Maybe try executing your prompt?",
+    icon: "terminal",
+    criteria: "print_questions",
     criteriaCount: 1,
   },
 ];
