@@ -136,7 +136,7 @@ const ACHIEVEMENTS = [
   },
   {
     id: "nutrition_nerd",
-    title: "Nutrition Nerd",
+    title: "Healthy Eater",
     description: "Ask about food, diet, or nutrition in your routine",
     icon: "salad",
     criteria: "nutrition_questions",
@@ -328,7 +328,7 @@ const ACHIEVEMENTS = [
   {
     id: "secret_word",
     title: "Word of Power",
-    description: "Hint: Some words unlock more than doors... try slipping the right one into your message.",
+    description: "Hint: Some words unlock more than doors... the one you need starts with 's'.",
     icon: "key",
     criteria: "secret_word_messages",
     criteriaCount: 1,
